@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Typeside · Stadium Arcadium</title><link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="css/style.css"></head>
+<body>
+<a class="skip" href="#main">Skip to challenge</a>
+<header class="nav"><a class="mark" href="./">TYPE<span>SIDE</span></a>
+<div class="sel"><label>Album<select id="album"></select></label><label>Disc<select id="disc"></select></label><label>Song<select id="song"></select></label></div>
+<button id="open-set" class="ghost">Settings</button></header>
+<div class="wrap">
+<aside id="lib"><div class="alb"><img id="art" alt="" hidden><div><h2 id="atitle"></h2><p id="asub"></p></div></div>
+<input id="q" type="search" placeholder="Search songs" aria-label="Search songs by title"><ul id="tracks"></ul></aside>
+<main id="main">
+<div class="head"><h1 id="title">Loading…</h1><p id="meta"></p></div>
+<noscript>This game needs JavaScript.</noscript>
+<section id="stage">
+<div class="bar"><label>Mode<select id="mode"><option value="full">Full Song</option><option value="random">Random Section</option><option value="practice">Practice</option></select></label>
+<button id="start" class="pri">Start Challenge</button><button id="pause">Pause</button><button id="restart">Restart</button><span id="status" role="status"></span></div>
+<p id="note" class="note"></p>
+<div class="stats"><div><b id="wpm">0</b><span>wpm</span></div><div><b id="acc">100%</b><span>accuracy</span></div><div><b id="err">0</b><span>errors now</span></div><div><b id="rem">–:––</b><span>song left</span></div></div>
+<div class="pgs"><div><span>Lyrics typed <em id="pt">0%</em> · <em id="chars">0 / 0</em></span><div class="meter"><i id="bt"></i></div></div>
+<div><span>Song played <em id="pa">0%</em> · <em id="clock">0:00 / 0:00</em></span><div class="meter"><i id="ba"></i></div></div></div>
+<p id="sec" class="sec"></p><p id="banner" class="banner" hidden></p>
+<div id="lyrics" tabindex="0" aria-label="Lyrics typing area. Click, then type the lyrics."></div>
+<p class="hint" id="hint">Click the lyrics to focus. On phones, tap them to open the keyboard (Backspace may be unreliable on some mobile keyboards).</p>
+<textarea id="cap" aria-label="Typing input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+</section>
+<section id="res" hidden><h2 id="r-title"></h2><p id="r-sub"></p><dl id="r-grid"></dl>
+<div class="bar"><button id="retry" class="pri">Retry</button><button id="replay">Replay</button><button id="back">Return to library</button></div></section>
+</main></div>
+<audio id="au" preload="auto"></audio>
+<dialog id="dlg"><form method="dialog"><h2>Settings</h2>
+<label class="chk"><input type="checkbox" id="s-caret"> Show typing caret</label>
+<label class="chk"><input type="checkbox" id="s-ok"> Highlight correct characters</label>
+<label class="chk"><input type="checkbox" id="s-bad"> Highlight incorrect characters</label>
+<label class="chk"><input type="checkbox" id="s-sound"> Error sound</label>
+<label class="chk"><input type="checkbox" id="s-reduced"> Reduced motion</label>
+<label class="chk"><input type="checkbox" id="s-confirm"> Confirm before leaving an active challenge</label>
+<label>Lyric font size <input type="range" id="s-font" min="16" max="40"></label>
+<label>Accent <select id="s-accent"><option value="red">Muted red</option><option value="amber">Amber</option></select></label>
+<h3>Local history</h3><ol id="hist"></ol><div class="bar"><button type="button" id="clear">Clear history</button><button value="close" class="pri">Close</button></div></form></dialog>
+<script src="js/typing-engine.js"></script><script src="js/app.js"></script>
+</body></html>
