@@ -96,57 +96,24 @@ function ui() {
 
 // ---------- library ----------
 
+
 async function probe(s) {
   if (cache[s.id]) return cache[s.id];
 
-  const chk = async (path) => {
-    // First try a lightweight HEAD request.
+  const chk = async p => {
     try {
-      const head = await fetch(url(path), {
-        method: 'HEAD',
-        cache: 'no-store'
-      });
-
-      if (head.ok) return true;
-    } catch {
-      // Some hosting environments may reject HEAD requests.
-    }
-
-    // Fall back to a one-byte GET request.
-    // Abort after receiving the response headers.
-    const controller = new AbortController();
-
-    try {
-      const response = await fetch(url(path), {
-        method: 'GET',
-        headers: { Range: 'bytes=0-0' },
-        cache: 'no-store',
-        signal: controller.signal
-      });
-
-      return response.ok;
+      return (await fetch(url(p), { method: 'HEAD' })).ok;
     } catch {
       return false;
-    } finally {
-      controller.abort();
     }
   };
 
-  if (s.status === 'unavailable') {
-    return cache[s.id] = {
-      audio: false,
-      lyrics: false,
-      forced: true
-    };
-  }
-
-  const result = {
-    audio: await chk(s.audio),
-    lyrics: await chk(s.lyrics)
-  };
-
-  cache[s.id] = result;
-  return result;
+  return cache[s.id] = s.status === 'unavailable'
+    ? { audio: false, lyrics: false, forced: true }
+    : {
+        audio: await chk(s.audio),
+        lyrics: await chk(s.lyrics)
+      };
 }
 
 // ---------- challenge ----------
