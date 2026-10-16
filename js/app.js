@@ -476,6 +476,36 @@ function syncSelects() {
   if (A.artwork) im.src = url(A.artwork);
 }
 
+
+function syncSelects() {
+  $('#disc').innerHTML = A.discs
+    .map(d => `<option value="${d.id}">${d.title}</option>`)
+    .join('');
+
+  $('#disc').value = D.id;
+
+  $('#song').innerHTML = songs
+    .filter(s => s.album === A.id && s.disc === D.id)
+    .map(s =>
+      `<option value="${s.id}">${String(s.track).padStart(2, '0')}. ${s.title.replace(/</g, '&lt;')}</option>`
+    )
+    .join('');
+
+  if (song) $('#song').value = song.id;
+
+  $('#atitle').textContent = A.title;
+  $('#asub').textContent = A.artist + ' · ' + A.year;
+
+  const im = $('#art');
+  im.hidden = true;
+  im.onload = () => im.hidden = false;
+  im.onerror = () => im.hidden = true;
+
+  if (A.artwork) {
+    im.src = url(A.artwork);
+  }
+}  
+
 function leave() {
   return !busy() ||
     !S.confirm ||
