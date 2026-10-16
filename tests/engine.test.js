@@ -1,0 +1,13 @@
+const E=require('../js/typing-engine.js'),assert=require('assert');
+let e=new E("hi yo\nok");
+assert.strictEqual(e.type('h'),true);assert.strictEqual(e.type('x'),false);
+assert.strictEqual(e.correct,1);assert.strictEqual(e.incorrect,1);assert.strictEqual(e.accuracy(),50);
+e.back();assert.strictEqual(e.pos,1);e.type('i');assert.ok(Math.abs(e.accuracy()-200/3)<1e-9);
+assert.strictEqual(e.wpm(0.5),0);assert.strictEqual(e.wpm(60),e.correct/5);
+for(const c of " yo\nok")e.type(c);
+assert.strictEqual(e.complete,true);assert.strictEqual(e.type('z'),null);assert.strictEqual(e.pos,e.text.length);
+assert.deepStrictEqual(e.words(),{correct:3,incorrect:0});
+let f=new E("ab");f.type('a');f.type('x');assert.strictEqual(f.complete,false);f.back();f.type('b');assert.strictEqual(f.complete,true);
+assert.strictEqual(new E("a").accuracy(),100);
+let g=new E("cat dog");for(const c of "cxt dog")g.type(c);assert.deepStrictEqual(g.words(),{correct:1,incorrect:1});
+console.log('engine tests passed');
