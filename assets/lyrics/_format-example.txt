@@ -1,0 +1,7 @@
+[Verse 1]
+This is an original example line
+Showing how a lyric file looks
+
+[Chorus]
+Section labels in brackets are shown but not typed
+Blank lines are stanza breaks and are typed as Enter
