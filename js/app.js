@@ -95,43 +95,58 @@ function ui() {
 }
 
 // ---------- library ----------
+
 async function probe(s) {
   if (cache[s.id]) return cache[s.id];
-  const chk = async p => { try { return (await fetch(url(p), { method: 'HEAD' })).ok; } catch { return false; } };
-  return cache[s.id] = s.status === 'unavailable' ? { audio: false, lyrics: false, forced: true } : { audio: await chk(s.audio), lyrics: await chk(s.lyrics) };
-}
-function renderList() {
-  const ul = $('#tracks'); ul.innerHTML = '';
-  songs.filter(s => s.album === A.id && (q || s.disc === D.id) && s.title.toLowerCase().includes(q)).forEach(s => {
-    const p = cache[s.id], li = document.createElement('li'), b = document.createElement('button');
-    const st = !p ? 'checking…' : p.audio && p.lyrics ? 'ready' : p.forced ? 'unavailable' : !p.audio && !p.lyrics ? 'needs audio + lyrics' : !p.audio ? 'needs audio' : 'needs lyrics';
-    b.innerHTML = '<span class="n"></span><span class="t"></span><span class="st"></span>';
-    b.children[0].textContent = String(s.track).padStart(2, '0'); b.children[1].textContent = (q ? s.disc[0].toUpperCase() + s.disc.slice(1) + ' · ' : '') + s.title; b.children[2].textContent = st;
-    if (song && s.id === song.id) b.classList.add('sel-on'); if (st === 'ready') b.classList.add('ok');
-    b.onclick = () => pick(s.id); li.append(b); ul.append(li);
-  });
-}
-function syncSelects() {
-  $('#disc').innerHTML = A.discs.map(d => `<option value="${d.id}">${d.title}</option>`).join(''); $('#disc').value = D.id;
-  $('#song').innerHTML = songs.filter(s => s.album === A.id && s.disc === D.id).map(s => `<option value="${s.id}">${String(s.track).padStart(2, '0')}. ${s.title.replace(/</g, '&lt;')}</option>`).join(''); if (song) $('#song').value = song.id;
-  $('#atitle').textContent = A.title; $('#asub').textContent = A.artist + ' · ' + A.year;
-  const im = $('#art'); im.hidden = true; im.onload = () => im.hidden = false; im.onerror = () => im.hidden = true; if (A.artwork) im.src = url(A.artwork);
-}
-function leave() { return !busy() || !S.confirm || confirm('A challenge is in progress. Leave it and lose your progress?'); }
-function hardStop() { cancelAnimationFrame(raf); au.pause(); C = newC(); $('#res').hidden = true; $('#stage').hidden = false; $('#banner').hidden = true; }
-async function pick(id) {
-  if (song && id !== song.id && !leave()) { $('#song').value = song.id; return; }
-  hardStop(); song = songs.find(s => s.id === id); A = albums.find(a => a.id === song.album); D = A.discs.find(d => d.id === song.disc);
-  syncSelects(); renderList(); $('#title').textContent = song.title; $('#meta').textContent = `${song.artist} · ${A.title} · ${D.title} disc · track ${song.track}`;
-  $('#lyrics').textContent = ''; items = []; setState('Checking files…'); ui();
-  const my = song, p = await probe(song); if (song !== my) return;
-  if (p.lyrics && !p.text) { try { const r = await fetch(url(song.lyrics)); if (!r.ok) throw 0; p.text = norm(await r.text()); if (!parse(p.text).length) throw 0; } catch { p.lyrics = false; p.bad = true; } }
-  if (song !== my) return;
-  if (p.audio) { au.src = url(song.audio); au.load(); } else { au.removeAttribute('src'); au.load(); }
-  renderList(); setState(p.audio && p.lyrics ? 'Ready' : 'Unavailable');
-  if (p.lyrics) { items = parse(p.text); const t = layout(items); C.eng = new TypingEngine(t); render(items, t); }
-  else $('#lyrics').innerHTML = '<p>No lyrics to show. See the note above.</p>';
-  upd(); ui();
+
+  const chk = async (path) => {
+    // First try a lightweight HEAD request.
+    try {
+      const head = await fetch(url(path), {
+        method: 'HEAD',
+        cache: 'no-store'
+      });
+
+      if (head.ok) return true;
+    } catch {
+      // Some hosting environments may reject HEAD requests.
+    }
+
+    // Fall back to a one-byte GET request.
+    // Abort after receiving the response headers.
+    const controller = new AbortController();
+
+    try {
+      const response = await fetch(url(path), {
+        method: 'GET',
+        headers: { Range: 'bytes=0-0' },
+        cache: 'no-store',
+        signal: controller.signal
+      });
+
+      return response.ok;
+    } catch {
+      return false;
+    } finally {
+      controller.abort();
+    }
+  };
+
+  if (s.status === 'unavailable') {
+    return cache[s.id] = {
+      audio: false,
+      lyrics: false,
+      forced: true
+    };
+  }
+
+  const result = {
+    audio: await chk(s.audio),
+    lyrics: await chk(s.lyrics)
+  };
+
+  cache[s.id] = result;
+  return result;
 }
 
 // ---------- challenge ----------
