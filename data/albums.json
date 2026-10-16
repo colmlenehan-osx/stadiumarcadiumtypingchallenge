@@ -1,0 +1,19 @@
+[
+ {
+  "id": "stadium-arcadium",
+  "title": "Stadium Arcadium",
+  "artist": "Red Hot Chili Peppers",
+  "year": 2006,
+  "artwork": "assets/artwork/stadium-arcadium.jpg",
+  "discs": [
+   {
+    "id": "jupiter",
+    "title": "Jupiter"
+   },
+   {
+    "id": "mars",
+    "title": "Mars"
+   }
+  ]
+ }
+]
